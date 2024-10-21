@@ -17,12 +17,15 @@ ARTICLE_INFO_FILE = $(OPENJOURNALS_PATH)/default-article-info.yaml
 
 IMAGE = openjournals/inara:edge
 
-.PHONY: all
-all: cff pdf html jats crossref native preprint
+MAKEFILE_DIR := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
-.PHONY: cff pdf html jats crossref native preprint
+.PHONY: all
+all: cff pdf tex html jats crossref native preprint
+
+.PHONY: cff pdf tex html jats crossref native preprint
 cff: $(TARGET_FOLDER)/paper.cff
 pdf: $(TARGET_FOLDER)/paper.pdf
+tex: $(TARGET_FOLDER)/paper.tex
 html: $(TARGET_FOLDER)/paper.html
 jats:	$(TARGET_FOLDER)/paper.jats
 native:	$(TARGET_FOLDER)/paper.native
@@ -68,6 +71,7 @@ clean:
 	rm -rf $(TARGET_FOLDER)/paper.html
 	rm -rf $(TARGET_FOLDER)/paper.jats
 	rm -rf $(TARGET_FOLDER)/paper.native
+	rm -rf $(TARGET_FOLDER)/paper.tex
 	rm -rf $(TARGET_FOLDER)/paper.pdf
 	rm -rf $(TARGET_FOLDER)/paper.preprint
 	rm -rf $(TARGET_FOLDER)/paper.preprint.tex
@@ -77,6 +81,7 @@ clean:
 	rm -rf example/paper.html
 	rm -rf example/paper.jats
 	rm -rf example/paper.native
+	rm -rf example/paper.tex
 	rm -rf example/paper.pdf
 	rm -rf example/paper.preprint
 	rm -rf example/paper.preprint.tex
@@ -89,6 +94,9 @@ clean:
 
 ## Tests
 
+# Note that SOURCE_DATE_EPOCH=1234567890 corresponds to 1234567890 seconds
+# from the unix epoch (January 1, 1970), which is in 2009
+
 # Command used to invoke Inara. Sets an environment variable that makes the
 # program ignore the real date.
 INARA_TEST_CMD = docker run --rm \
@@ -96,17 +104,24 @@ INARA_TEST_CMD = docker run --rm \
 	--env SOURCE_DATE_EPOCH=1234567890 \
 	-v $${PWD}:/data $(IMAGE)
 
+# Uncomment this if you want to run tests locally instead of inside docker,
+# though note that there might be non-trivial differences that are hard to explain.
+# You also have to run `cp -r resources/* .` to copy all of the resource files
+# into the root directory, since this makefile relies on this directory structure
+# which the dockerfile creates
+# INARA_TEST_CMD = SOURCE_DATE_EPOCH=1234567890 JOURNAL=joss OPENJOURNALS_PATH=$(MAKEFILE_DIR) sh scripts/entrypoint.sh
+
 .PHONY: test test-golden-draft test-golden-pub
 test: test-golden-draft test-golden-pub
 test-golden-draft: \
 	test-draft-crossref \
 	test-draft-jats \
-	test-draft-pdf \
+	test-draft-tex \
 	test-draft-preprint
 test-golden-pub: \
 	test-pub-crossref \
 	test-pub-jats \
-	test-pub-pdf \
+	test-pub-tex \
 	test-pub-preprint
 
 .PHONY: test-pub-jats test-pub-preprint test-pub-%
@@ -122,12 +137,12 @@ test-pub-%:
 .PHONY: test-draft-jats test-draft-preprint test-draft-%
 test-draft-jats:
 	$(INARA_TEST_CMD) -o jats example/paper.md
-	diff test/expected-paper.jats/paper.jats example/jats/paper.jats
+	diff test/expected-draft/paper.jats/paper.jats example/jats/paper.jats
 test-draft-preprint: GOLDEN_FILE = paper.preprint.tex
 test-draft-%:        GOLDEN_FILE = paper.$*
 test-draft-%:
 	$(INARA_TEST_CMD) -o $* example/paper.md
-	diff test/expected-$(GOLDEN_FILE) example/$(GOLDEN_FILE)
+	diff test/expected-draft/$(GOLDEN_FILE) example/$(GOLDEN_FILE)
 
 NCBI_FTP = "ftp://ftp.ncbi.nih.gov/pub/jats/publishing/1.2/xsd/"
 test/JATS-Publishing-1-2-MathML2-XSD.zip:
@@ -141,6 +156,6 @@ test/JATS-journalpublishing1.xsd: \
 	rm -rf /tmp/JATS-Publishing-1-2-MathML2-XSD
 
 .PHONY: validate-jats
-validate-jats: test/expected-paper.jats/paper.jats \
+validate-jats: test/expected-draft/paper.jats/paper.jats \
 		test/JATS-journalpublishing1.xsd
 	xmllint --schema test/JATS-journalpublishing1.xsd $< --noout
