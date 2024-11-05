@@ -47,5 +47,5 @@ ENV OPENJOURNALS_PATH=$openjournals_path
 
 # Input is read from `paper.md` by default, but can be overridden. Output is
 # written to `paper.pdf`
-ENTRYPOINT ["/usr/local/bin/inara"]
+ENTRYPOINT ["/mnt/c/Users/Robin/Documents/Git/inara"]
 CMD ["paper.md"]
