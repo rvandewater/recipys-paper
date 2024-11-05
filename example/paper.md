@@ -1,40 +1,26 @@
 ---
 title: >-
     ReciPys: An Intuitive and Fast Python Package that Simplifies Proper Machine Learning Preprocessing Pipelines
-    ReciPys: An Intuitive and Fast Python Package that Simplifies Proper Machine Learning Preprocessing Pipelines
 authors:
-  - name: Robin van de Water
   - name: Robin van de Water
     email: albert@zeitkraut.de
     affiliation: [1, 2]
     orcid: 0000-0002-2895-4872
-    affiliation: [1, 2]
-    orcid: 0000-0002-2895-4872
     corresponding: true
-  - name: Hendrik Schmidt
   - name: Hendrik Schmidt
     orcid: 0000-0001-7699-3983
     affiliation: 
     equal-contrib: false
   - name: Patrick Rockenschaub
     orcid: 0000-0002-6499-7933
-    affiliation: 
-    equal-contrib: false
-  - name: Patrick Rockenschaub
-    orcid: 0000-0002-6499-7933
     affiliation: [1, 3]
-    equal-contrib: false
     equal-contrib: false
 affiliations:
   - index: 1
     name: Hasso Plattner Institute, University of Potsdam, Potsdam, Germany
-    name: Hasso Plattner Institute, University of Potsdam, Potsdam, Germany
   - index: 2
     name: Hasso Plattner Institute for Digital Health at Mount Sinai, Icahn School of Medicine at Mount Sinai, New York City, NY, USA
-    name: Hasso Plattner Institute for Digital Health at Mount Sinai, Icahn School of Medicine at Mount Sinai, New York City, NY, USA
   - index: 3
-    name: Innsbruck Medical University, Innsbruck, Austria
-date: 2024-07-04
     name: Innsbruck Medical University, Innsbruck, Austria
 date: 2024-07-04
 bibliography: paper.bib
