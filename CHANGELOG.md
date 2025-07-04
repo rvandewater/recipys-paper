@@ -2,6 +2,14 @@
 
 `Inara` uses [SemVer][] (semantic versioning).
 
+## Inara v1.1.4
+
+Released 2024-11-06.
+
+- HTML-escape institution names in CrossRef XML.
+- Set copyright year to the year in which the article was
+  publishing.
+
 ## Inara v1.1.3
 
 Released 2024-10-24.
@@ -15,7 +23,7 @@ All contributions by Juanjo Bazán.
 
 Released 2024-10-23.
 
-All contributions by Charles Taplev Hovt.
+All contributions by Charles Tapley Hoyt.
 
 - Fix bug in the height of ROR logos.
   (https://github.com/openjournals/inara/pull/90)
