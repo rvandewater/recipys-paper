@@ -1,6 +1,6 @@
 ---
 title: >-
-    ReciPys: An Intuitive Machine Learning Transformation Pipeline for Reproducible Data Preprocessing
+    ReciPies: An Intuitive Machine Learning Transformation Pipeline for Reproducible Data Preprocessing
 authors:
   - name: Robin P. van de Water
     email: robin.vandewater@hpi.de
@@ -24,7 +24,7 @@ affiliations:
     name: Innsbruck Medical University, Innsbruck, Austria
 date: 2024-07-04
 bibliography: paper.bib
-repository: https://github.com/rvandewater/ReciPys
+repository: https://github.com/rvandewater/ReciPies
 tags:
   - reference
   - example
@@ -34,27 +34,37 @@ tags:
 <!-- 
 Guide:
 https://github.com/openjournals/inara/blob/main/example/paper.md  -->
-# Summary
+<!-- # Summary
 
 Machine learning pipelines often require complicated preprocessing pipelines. Our aim is to simplify this with a python package that can be used to define human-readable and reproducible pipelines for machine learning tasks.
 
 # Statement of Need
 
-Python is the most popular programming language for machine learning. However, preprocessing data for machine learning tasks can be a time-consuming and error-prone process. ReciPys is a python package that aims to simplify this process by providing a fast and intuitive interface for preprocessing data. It can use both a polars [@PolarsPolars2024] backend, which allows for fast python-native data processing, and a traditional Pandas [@mckinney-proc-scipy-2010] backend for use with legacy data tools. 
-ReciPys is designed to be easy to use and flexible, allowing users to easily preprocess data for a wide range of machine learning pipelines. 
-Moreover, we hide the complexity of the preprocessing pipeline from the user which allows for more reproducible and maintainable code.
+Python is the most popular programming language for machine learning. However, preprocessing data for machine learning tasks can be a time-consuming and error-prone process. ReciPies is a python package that aims to simplify this process by providing a fast and intuitive interface for preprocessing data. It can use both a polars [@PolarsPolars2024] backend, which allows for fast python-native data processing, and a traditional Pandas [@mckinney-proc-scipy-2010] backend for use with legacy data tools. 
+ReciPies is designed to be easy to use and flexible, allowing users to easily preprocess data for a wide range of machine learning pipelines. 
+Moreover, we hide the complexity of the preprocessing pipeline from the user which allows for more reproducible and maintainable code. -->
+
+# Summary
+Modern machine‑learning workflows live or die by their data‑preprocessing steps, yet in Python these steps are often scattered across ad‑hoc scripts or opaque Scikit-Learn (sklearn)[@pedregosa_scikit-learn_2011] pipelines that are hard to read, audit, or reuse. ReciPies provides a concise, human‑readable, and fully reproducible way to declare, execute, and share preprocessing pipelines. Inspired by the R recipes package[@kuhnRecipesPreprocessingFeature2024], it lets users describe transformations as a recipe made of ordered “steps” (e.g., imputing, encoding, normalizing) applied to variables identified by semantic roles (predictor, outcome, ID, time stamp, etc.). Recipes can be prepped (trained) once, baked many times, and cleanly separated between training and new data—preventing data leakage by construction. Under the hood, ReciPies targets both Pandas and Polars backends for performance and flexibility, and it is easily extensible: users can register custom steps with minimal boilerplate. Each recipe is serializable to JSON/YAML for provenance tracking, collaboration, and publication, and integrates smoothly with downstream modeling libraries. By packaging preprocessing as clear, declarative objects, ReciPies lowers the cognitive load of feature engineering, improves reproducibility, and makes methodological choices explicit—benefitting individual researchers, collaborative teams, and reviewers alike.
+
+# Statement of need
+Robust machine‑learning results hinge on transparent, reproducible data‑preprocessing—yet in Python these steps are typically spread across ad‑hoc notebooks that lack structure or buried inside opaque sklearn pipelines, if this code is available at all. Additionally, most variable semantics are unclear (Which columns are outcomes? IDs? Time stamps?); this encourages accidental data leakage when “fitting” transforms on the full dataset, and complicates peer review and reuse. Researchers working with longitudinal or regulated data (e.g., health, finance, environmental monitoring) especially need pipelines they can audit, serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code [@10.1145/3641525]. The lack of reproducibility has been documented extensively in literature [@johnsonReproducibilityCriticalCare2017a; @kellyKeyChallengesDelivering2019a; @sarwarSecondaryUseElectronic2023; @semmelrockReproducibilityMachinelearningbasedResearch2025].
+
+ReciPies fills this gap by bringing a tidy, stepwise **recipe** interface to Python. Users declare transformations over variables selected by semantic roles; recipes are “prepped” once on training data and “baked” on new data to eliminate leakage; and every step is inspectable, versionable, and serializable (JSON/YAML). ReciPies runs on both Pandas[@mckinney-proc-scipy-2010] and Polars[@PolarsPolars2024] for performance and interoperability, and its plugin system lets users register custom steps with minimal boilerplate. We illustrate its utility on an intensive‑care prediction task and in teaching settings, showing that a clear, declarative preprocessing grammar reduces cognitive load, eases collaboration, and strengthens the reproducibility of published ML results.
 
 # Related Work
-
-The package was inspired by the R package by @kuhnRecipesPreprocessingFeature2024. As such, it is designed to be a python equivalent of the R package, with functionality that is aimed at the ML community. 
-The package is designed to be used as part of a pipeline that include machine learning libraries such as Scikit-Learn [@pedregosa_scikit-learn_2011] and PyTorch[@paszkePyTorchImperativeStyle2019].
+The package was inspired by the R package by [@kuhnRecipesPreprocessingFeature2024]. As such, it is designed to be a python equivalent of the R package, with functionality that is aimed at the ML community.
+The module is designed to be used as part of a pipeline that include machine learning libraries such as sklearn [@pedregosa_scikit-learn_2011] and PyTorch[@paszkePyTorchImperativeStyle2019].
 It is based on the principles of Configuration as Code, which allows for easy reproducibility of scientific ML experiments. 
 
+Existing libraries address parts of this workflow but leave important gaps that break the chain of reproducibility. sklearn offers composable transformers, but no role-based variable grammar, limited human-readability, and awkward serialization beyond pickling. Packages like feature-engine[@galliFeatureenginePythonPackage2021], pyjanitor[@j.PyjanitorCleanerAPI2019], or scikit-lego[@warmerdamKoaningScikitlegoV0952025] add helpful transformers or cleaning verbs, yet none provide a unified, declarative recipe abstraction with a strict “prep/bake” split and backend flexibility. The R ecosystem’s recipes package demonstrates the value of such a grammar, but no Python counterpart has consolidated these ideas. Given that Python is a dominant language for machine learning, ReciPies fills this gap by providing a stepwise recipe interface that is easy to use, easy to read, and flexible, allowing users to easily preprocess data for a wide range of machine learning pipelines.
+
 # Application: ICU Data
+We illustrate ReciPies on an ICU mortality prediction task using the MIMIC‑IV database [@johnsonMIMICIVFreelyAccessible2023]. The pipeline required timestamp-aware splits, role-based variable selection (IDs, outcomes, time), and consistent imputation/encoding across train–test partitions. With ReciPies, we declared these steps as a serializable recipe, ‘prepped’ once on the training cohort, then ‘baked’ on held‑out patients—eliminating data leakage and making each transformation auditable. The complete recipe (12 steps, ~30 lines) is archived with the paper and can be reapplied to future cohorts without modification. Full code, benchmarks, and interactive notebooks are available in the project documentation.
 
-The package was specifically aimed towards temporal EHR data and was developed as part of Yet Another ICU Benchmark [@waterAnotherICUBenchmark2023]. We demonstrate the utility of ReciPys by preprocessing a dataset of ICU patients. The dataset contains information about patients in the ICU, including vital signs, lab results, and medications. We show how ReciPys can be used to preprocess this data and prepare it for machine learning tasks.
+The package was specifically aimed towards temporal EHR data and was developed as part of Yet Another ICU Benchmark [@vandewaterAnotherICUBenchmark2024a], a flexible benchmarking framework for EHR and ICU models that has been adapted by the community in multiple works [@shenDataAdditionDilemma2024b; @santosImprovingRepresentationLearning2025]. We demonstrate the utility of ReciPies by preprocessing a dataset of ICU patients. The dataset contains information about patients in the ICU, including vital signs, lab results, and medications. We show how ReciPies can be used to preprocess this data and prepare it for machine learning tasks.
 
-If we have a dataset, `df` with a label `y`, some features `x1`, `x2`, `x3`, `x4`, an identifier `id`, and a sequential component `time`, we can build a preprocessing pipeline using ReciPys. We first do a train/test split:
+If we have a dataset, `df` with a label `y`, some features `x1`, `x2`, `x3`, `x4`, an identifier `id`, and a sequential component `time`, we can build a preprocessing pipeline using ReciPies. We first do a train/test split:
 ``` python
 df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
 roles = {outcomes:["y"], predictors=["x1", "x2", "x3", "x4"], groups=["id"], 
@@ -75,9 +85,10 @@ We can now fit the recipe and transform both the train and test set without leak
 df_train = rec.prep()
 df_test = rec.bake(df_test)
 ```
+Note that we can also use the `bake` method on the training set to transform it again, e.g., to apply the same transformations to a new dataset.
 
 # Benchmarks
-Below we show benchmarks for ReciPys using both a Pandas and Polars backend. We compare the time taken to preprocess data using ReciPys with the time taken to preprocess data using Pandas and Polars directly. The benchmarks show a mixed picture with the Pandas backend still outperforming Polars on some steps. Presumably this is due to some functionality not being natively available in Polars at the time of writing. The experiments have been performed with 5 seeds and the mean and standard deviation are reported.
+Below we show benchmarks for ReciPies using both a Pandas and Polars backend. We compare the time taken to preprocess data using ReciPies with the time taken to preprocess data using Pandas and Polars directly. The benchmarks show a mixed picture with the Pandas backend still outperforming Polars on some steps. Presumably this is due to some functionality not being natively available in Polars at the time of writing. The experiments have been performed with 5 seeds and the mean and standard deviation are reported.
 
 ![Duration for each step and data size.](images/duration_combined_plots.pdf)
 ![Memory usage for each step and data size.](images/memory_combined_plots.pdf)
