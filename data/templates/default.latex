@@ -161,6 +161,9 @@ $endif$
 \fancyheadoffset[L]{4.5cm}
 \fancyfootoffset[L]{4.5cm}
 
+% Add pandocbounded command for newer pandoc versions
+\providecommand{\pandocbounded}[1]{#1}
+
 % --- Macros ---------
 
 \definecolor{linky}{rgb}{0.0, 0.5, 1.0}
@@ -275,7 +278,12 @@ $endif$
 \usepackage{fontsetup} % Lazy way to get proper Greek lowercase glyphs
 
 % Use Hack https://sourcefoundry.org/hack/
-\setmonofont{Hack}
+% Fallback to Courier if Hack is not available
+\IfFontExistsTF{Hack}{%
+    \setmonofont{Hack}%
+}{%
+    \setmonofont{Courier}%
+}
 
 $if(colorlinks)$
 \PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
